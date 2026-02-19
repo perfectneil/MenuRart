@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Resticul'Art</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(255, 136, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #ff8800 0%, #ffaa00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .cart-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff8800 0%, #ff6600 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(255, 136, 0, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .cart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 136, 0, 0.6);
+        }
+
+        .cart-count {
+            background: #4CAF50;
+            border-radius: 50%;
+            padding: 5px 10px;
+            margin-left: 10px;
+            font-size: 0.9em;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #ff8800;
+            color: #ff8800;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .menu-item {
+            background: linear-gradient(135deg, #2a2a2a 0%, #353535 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid #444;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(255, 136, 0, 0.3);
+            border-color: #ff8800;
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 3px solid #ff8800;
+        }
+
+        .menu-item-content {
+            padding: 20px;
+        }
+
+        .menu-item-name {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        .menu-item-price {
+            font-size: 1.3em;
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .menu-item-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background: linear-gradient(135deg, #555 0%, #666 100%);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: linear-gradient(135deg, #ff8800 0%, #ff6600 100%);
+            transform: scale(1.1);
+        }
+
+        .quantity-display {
+            font-size: 1.3em;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+            color: #ffaa00;
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a2a2a 0%, #353535 100%);
+            margin: 50px auto;
+            padding: 30px;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(255, 136, 0, 0.3);
+            border: 2px solid #ff8800;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ff8800;
+        }
+
+        .modal-header h2 {
+            color: #ff8800;
+            font-size: 2em;
+        }
+
+        .close-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #cc0000;
+            transform: rotate(90deg);
+        }
+
+        .cart-item {
+            background: #3a3a3a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 1.2em;
+            color: #ffaa00;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .cart-item-quantity {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .remove-item-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-item-btn:hover {
+            background: #cc0000;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-size: 1.5em;
+            margin: 25px 0;
+            padding: 15px;
+            background: #3a3a3a;
+            border-radius: 10px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .order-form {
+            margin-top: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #555;
+            background: #2a2a2a;
+            color: white;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff8800;
+            box-shadow: 0 0 10px rgba(255, 136, 0, 0.3);
+        }
+
+        .submit-order-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-order-btn:hover {
+            background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .cart-button {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                padding: 12px 20px;
+            }
+
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="cart-button" onclick="openCart()">
+        🛒 Panier <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Resticul'Art</h1>
+            <p>Menu Digital - Commandez en ligne</p>
+        </div>
+
+        <!-- Section Entrées -->
+        <div class="section">
+            <h2 class="section-title">🥗 Les Entrées</h2>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/saladedecrevettesàlavocat.jpeg" 
+                         alt="Salade de Crevettes à l'Avocat" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Salade+Crevettes'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Salade de Crevettes à l'Avocat</div>
+                        <div class="menu-item-price">6 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Salade de Crevettes à l\'Avocat', 6500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/brochettesdepouletàlamenthe.jpeg" 
+                         alt="Brochettes de Poulet à la Menthe" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Brochettes+Poulet'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Brochettes de Poulet à la Menthe</div>
+                        <div class="menu-item-price">5 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Brochettes de Poulet à la Menthe', 5500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Plats -->
+        <div class="section">
+            <h2 class="section-title">🍽️ Les Plats</h2>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/lecapitainebraiséresticulart.jpeg" 
+                         alt="Le Capitaine Braisé Resticul'Art" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Capitaine+Braisé'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Le Capitaine Braisé "Resticul'Art"</div>
+                        <div class="menu-item-price">12 000 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Le Capitaine Braisé \"Resticul\'Art\"', 12000)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/filetdeboeufaupoivre.jpeg" 
+                         alt="Filet de Bœuf au Poivre" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Filet+Bœuf'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Le Filet de Bœuf au Poivre</div>
+                        <div class="menu-item-price">14 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Le Filet de Bœuf au Poivre', 14500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/pâtesauxlégumesdumarché.jpeg" 
+                         alt="Pâtes aux Légumes du Marché" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Pâtes+Légumes'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Pâtes aux Légumes du Marché</div>
+                        <div class="menu-item-price">8 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Pâtes aux Légumes du Marché', 8500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/pouletbraiséàlherbeverte.jpeg" 
+                         alt="Poulet braisé à l'herbe douce" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Poulet+Braisé'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Poulet braisé à l'herbe douce</div>
+                        <div class="menu-item-price">9 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Poulet braisé à l\'herbe douce', 9500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Desserts et Boissons -->
+        <div class="section">
+            <h2 class="section-title">🍰 Desserts et Boissons</h2>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/fonfantauchocolat.jpeg" 
+                         alt="Fondant au Chocolat" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Fondant+Chocolat'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Fondant au Chocolat</div>
+                        <div class="menu-item-price">4 000 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Fondant au Chocolat', 4000)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/bissapsignature.jpeg" 
+                         alt="Bissap Signature" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Bissap'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Bissap Signature</div>
+                        <div class="menu-item-price">2 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Bissap Signature', 2500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item">
+                    <img src="https://resticulart.github.io/commande-resticulart2/images/jusdananassignatureresticulart.jpeg" 
+                         alt="Le cocktail signature R'Art" 
+                         class="menu-item-image"
+                         onerror="this.src='https://via.placeholder.com/400x300/2a2a2a/ff8800?text=Cocktail+R\'Art'">
+                    <div class="menu-item-content">
+                        <div class="menu-item-name">Le cocktail signature : le R'Art</div>
+                        <div class="menu-item-price">3 500 FCFA</div>
+                        <div class="menu-item-controls">
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">−</button>
+                                <span class="quantity-display">1</span>
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" onclick="addToCart(this, 'Le cocktail signature : le R\'Art', 3500)">
+                                Ajouter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Panier -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Votre Panier</h2>
+                <button class="close-btn" onclick="closeCart()">×</button>
+            </div>
+            <div id="cartItems"></div>
+            <div class="cart-total">
+                Total: <span id="cartTotal">0</span> FCFA
+            </div>
+            <div class="order-form">
+                <div class="form-group">
+                    <label>Nom complet *</label>
+                    <input type="text" id="customerName" placeholder="Votre nom" required>
+                </div>
+                <div class="form-group">
+                    <label>Numéro de téléphone *</label>
+                    <input type="tel" id="customerPhone" placeholder="+229 XX XX XX XX" required>
+                </div>
+                <div class="form-group">
+                    <label>Adresse de livraison *</label>
+                    <input type="text" id="customerAddress" placeholder="Votre adresse complète" required>
+                </div>
+                <div class="form-group">
+                    <label>Allergies / Intolérances</label>
+                    <textarea id="customerAllergies" rows="2" placeholder="Mentionnez vos allergies éventuelles"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Heure de récupération souhaitée *</label>
+                    <input type="time" id="pickupTime" required>
+                </div>
+                <button class="submit-order-btn" onclick="submitOrder()">
+                    📱 Envoyer la commande sur WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+
+        function increaseQuantity(button) {
+            const quantityDisplay = button.previousElementSibling;
+            let quantity = parseInt(quantityDisplay.textContent);
+            quantity++;
+            quantityDisplay.textContent = quantity;
+        }
+
+        function decreaseQuantity(button) {
+            const quantityDisplay = button.nextElementSibling;
+            let quantity = parseInt(quantityDisplay.textContent);
+            if (quantity > 1) {
+                quantity--;
+                quantityDisplay.textContent = quantity;
+            }
+        }
+
+        function addToCart(button, itemName, itemPrice) {
+            const menuItem = button.closest('.menu-item');
+            const quantityDisplay = menuItem.querySelector('.quantity-display');
+            const quantity = parseInt(quantityDisplay.textContent);
+
+            const existingItemIndex = cart.findIndex(item => item.name === itemName);
+            
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                cart.push({
+                    name: itemName,
+                    price: itemPrice,
+                    quantity: quantity
+                });
+            }
+
+            updateCartCount();
+            quantityDisplay.textContent = '1';
+            
+            // Animation de confirmation
+            button.textContent = '✓ Ajouté';
+            button.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+            setTimeout(() => {
+                button.textContent = 'Ajouter';
+                button.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+            }, 1000);
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = totalItems;
+        }
+
+        function openCart() {
+            updateCartDisplay();
+            document.getElementById('cartModal').style.display = 'block';
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function updateCartDisplay() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            const cartTotalSpan = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<div class="empty-cart">🛒 Votre panier est vide</div>';
+                cartTotalSpan.textContent = '0';
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${item.price.toLocaleString()} FCFA × ${item.quantity} = ${itemTotal.toLocaleString()} FCFA</div>
+                        </div>
+                        <button class="remove-item-btn" onclick="removeFromCart(${index})">🗑️</button>
+                    </div>
+                `;
+            });
+
+            cartItemsDiv.innerHTML = html;
+            cartTotalSpan.textContent = total.toLocaleString();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        function submitOrder() {
+            if (cart.length === 0) {
+                alert('❌ Votre panier est vide !');
+                return;
+            }
+
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            const customerAddress = document.getElementById('customerAddress').value.trim();
+            const customerAllergies = document.getElementById('customerAllergies').value.trim();
+            const pickupTime = document.getElementById('pickupTime').value;
+
+            if (!customerName || !customerPhone || !customerAddress || !pickupTime) {
+                alert('❌ Veuillez remplir tous les champs obligatoires (*)');
+                return;
+            }
+
+            let message = `🍽️ *NOUVELLE COMMANDE RESTICUL'ART*\n\n`;
+            message += `👤 *Client:* ${customerName}\n`;
+            message += `📱 *Téléphone:* ${customerPhone}\n`;
+            message += `📍 *Adresse:* ${customerAddress}\n`;
+            message += `⏰ *Heure de récupération:* ${pickupTime}\n`;
+            
+            if (customerAllergies) {
+                message += `⚠️ *Allergies:* ${customerAllergies}\n`;
+            }
+            
+            message += `\n📋 *COMMANDE:*\n`;
+            message += `━━━━━━━━━━━━━━━━\n`;
+
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                message += `\n✓ ${item.name}\n`;
+                message += `   ${item.quantity} × ${item.price.toLocaleString()} FCFA = ${itemTotal.toLocaleString()} FCFA\n`;
+            });
+
+            message += `\n━━━━━━━━━━━━━━━━\n`;
+            message += `💰 *MONTANT TOTAL: ${total.toLocaleString()} FCFA*`;
+
+            const whatsappNumber = '2290191766106';
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+            window.open(whatsappUrl, '_blank');
+
+            // Réinitialiser après envoi
+            setTimeout(() => {
+                if (confirm('✅ Commande envoyée sur WhatsApp !\n\nVoulez-vous vider le panier ?')) {
+                    cart = [];
+                    updateCartCount();
+                    closeCart();
+                    document.getElementById('customerName').value = '';
+                    document.getElementById('customerPhone').value = '';
+                    document.getElementById('customerAddress').value = '';
+                    document.getElementById('customerAllergies').value = '';
+                    document.getElementById('pickupTime').value = '';
+                }
+            }, 500);
+        }
+
+        // Fermer le modal en cliquant à l'extérieur
+        window.onclick = function(event) {
+            const modal = document.getElementById('cartModal');
+            if (event.target == modal) {
+                closeCart();
+            }
+        }
+    </script>
+</body>
+</html>
